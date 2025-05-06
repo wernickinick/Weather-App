@@ -14,7 +14,7 @@ public class Weather {
 
     private static String APIKEY = "cad7df9f68142b76a36246b3cc571f8a";
 
-    public static String WeatherData(String City){
+    public static  String Temperature(String City){
         try {
             URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + City + "&appid=" + APIKEY);
             HttpURLConnection Connection = (HttpURLConnection) url.openConnection();
@@ -42,10 +42,46 @@ public class Weather {
 
             String Country = (String) SecObj.get("country");
 
-            return "Description: " + Description + "\nTemperature: " + Math.round(TemperatureFarenhieght) + "°F\nHumidity: " + Humidity + "%\n"
-                    + "Country: " + Country;
+            return
+                    Math.round(TemperatureFarenhieght) + "°F";
         } catch (Exception e){
-            return "Failed To Get Weather! \n Try Again Later...";
+            return "Failed To Get Weather!";
+        }
+
+    }
+
+    public static  String WeatherData(String City){
+        try {
+            URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + City + "&appid=" + APIKEY);
+            HttpURLConnection Connection = (HttpURLConnection) url.openConnection();
+            Connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
+            String Response = "";
+            String Line;
+            while((Line = reader.readLine()) != null){
+                Response += Line;
+            }
+            reader.close();
+
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(Response);
+            JSONObject MainObj = (JSONObject) jsonObject.get("main");
+            JSONObject SecObj = (JSONObject) jsonObject.get("sys");
+
+            double TemperatureKelvin = (double) MainObj.get("temp");
+            long Humidity = (long) MainObj.get("humidity");
+            double TemperatureFarenhieght = (TemperatureKelvin - 273.15) * 9/5 + 32;
+
+            JSONArray WeatherArray = (JSONArray) jsonObject.get("weather");
+            JSONObject Weather = (JSONObject) WeatherArray.get(0);
+            String Description = (String) Weather.get("description");
+
+            String Country = (String) SecObj.get("country");
+
+            return
+                    Description;
+        } catch (Exception e){
+            return "";
         }
 
     }
@@ -83,18 +119,30 @@ public class Weather {
         SearchButton.setFont(new Font("Ariel",Font.BOLD,30));
         WeatherPanel.add(SearchButton);
 
-        JTextArea BetaWeather = new JTextArea();
-        BetaWeather.setBounds(100,170,300,500);
-        BetaWeather.setEditable(false);
-        BetaWeather.setBackground(Color.GRAY);
-        WeatherPanel.add(BetaWeather);
+        JLabel Degrees = new JLabel("",SwingConstants.CENTER);
+        Degrees.setBounds(0,200,500,100);
+        Degrees.setFont(new Font("ariel",Font.BOLD,40));
+        WeatherPanel.add(Degrees);
+
+        JLabel description = new JLabel("",SwingConstants.CENTER);
+        description.setBounds(0,300,500,100);
+        description.setFont(new Font("ariel",Font.BOLD,40));
+        WeatherPanel.add(description);
+
+        JLabel city = new JLabel("",SwingConstants.CENTER);
+        city.setBounds(100,120,300,100);
+        city.setFont(new Font("ariel",Font.BOLD,40));
+        WeatherPanel.add(city);
 
         SearchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String City = SearchBar.getText();
-                String Weather = WeatherData(City);
-                BetaWeather.setText(Weather);
+                String Weather = Temperature(City);
+                String Description = WeatherData(City);
+                Degrees.setText(Weather);
+                city.setText(City.toUpperCase());
+                description.setText(Description.toUpperCase());
                 if(City != null){
                     SearchBar.setText("");
                 }
