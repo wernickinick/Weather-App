@@ -1,7 +1,6 @@
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
