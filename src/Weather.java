@@ -50,7 +50,7 @@ public class Weather {
 
     }
 
-    public static  String WeatherData(String City){
+    public static  String Decription(String City){
         try {
             URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + City + "&appid=" + APIKEY);
             HttpURLConnection Connection = (HttpURLConnection) url.openConnection();
@@ -82,6 +82,78 @@ public class Weather {
                     Description;
         } catch (Exception e){
             return "";
+        }
+
+    }
+
+    public static  String Country(String City){
+        try {
+            URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + City + "&appid=" + APIKEY);
+            HttpURLConnection Connection = (HttpURLConnection) url.openConnection();
+            Connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
+            String Response = "";
+            String Line;
+            while((Line = reader.readLine()) != null){
+                Response += Line;
+            }
+            reader.close();
+
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(Response);
+            JSONObject MainObj = (JSONObject) jsonObject.get("main");
+            JSONObject SecObj = (JSONObject) jsonObject.get("sys");
+
+            double TemperatureKelvin = (double) MainObj.get("temp");
+            long Humidity = (long) MainObj.get("humidity");
+            double TemperatureFarenhieght = (TemperatureKelvin - 273.15) * 9/5 + 32;
+
+            JSONArray WeatherArray = (JSONArray) jsonObject.get("weather");
+            JSONObject Weather = (JSONObject) WeatherArray.get(0);
+            String Description = (String) Weather.get("description");
+
+            String Country = (String) SecObj.get("country");
+
+            return
+                    Country;
+        } catch (Exception e){
+            return "Check Name";
+        }
+
+    }
+
+    public static  String icon(String City){
+        try {
+            URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + City + "&appid=" + APIKEY);
+            HttpURLConnection Connection = (HttpURLConnection) url.openConnection();
+            Connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
+            String Response = "";
+            String Line;
+            while((Line = reader.readLine()) != null){
+                Response += Line;
+            }
+            reader.close();
+
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(Response);
+            JSONObject MainObj = (JSONObject) jsonObject.get("main");
+            JSONObject SecObj = (JSONObject) jsonObject.get("sys");
+
+            double TemperatureKelvin = (double) MainObj.get("temp");
+            long Humidity = (long) MainObj.get("humidity");
+            double TemperatureFarenhieght = (TemperatureKelvin - 273.15) * 9/5 + 32;
+
+            JSONArray WeatherArray = (JSONArray) jsonObject.get("weather");
+            JSONObject Weather = (JSONObject) WeatherArray.get(0);
+            String Description = (String) Weather.get("description");
+
+            String icon = (String) Weather.get("icon");
+
+            return
+                    icon;
+        } catch (Exception e){
+            return "error";
         }
 
     }
@@ -134,15 +206,30 @@ public class Weather {
         city.setFont(new Font("ariel",Font.BOLD,40));
         WeatherPanel.add(city);
 
+        JLabel country = new JLabel("",SwingConstants.CENTER);
+        country.setBounds(0,250,500,100);
+        country.setFont(new Font("ariel",Font.BOLD,40));
+        WeatherPanel.add(country);
+
+        JLabel weatherLogo = new JLabel(new ImageIcon(""));
+        weatherLogo.setBounds(150,400,200,100);
+        WeatherPanel.add(weatherLogo);
+
+
         SearchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String City = SearchBar.getText();
                 String Weather = Temperature(City);
-                String Description = WeatherData(City);
+                String Description = Decription(City);
+                String Country = Country(City);
+                String Icon = icon(City);
                 Degrees.setText(Weather);
                 city.setText(City.toUpperCase());
                 description.setText(Description.toUpperCase());
+                country.setText("Country: " + Country.toUpperCase());
+                ImageIcon icon = new ImageIcon("src/Icons/"+ Icon + ".png");
+                weatherLogo.setIcon(icon);
                 if(City != null){
                     SearchBar.setText("");
                 }
