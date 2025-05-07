@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 
 public class Weather {
 
-    private static String APIKEY = "cad7df9f68142b76a36246b3cc571f8a";
+    private static String APIKEY = "YourAPIkey";
 
     //Gets temperature
     public static  String Temperature(String City){
